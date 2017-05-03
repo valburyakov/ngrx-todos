@@ -3,12 +3,12 @@ import { EffectsRunner, EffectsTestingModule } from '@ngrx/effects/testing';
 import { TestBed } from '@angular/core/testing';
 import { TodosEffects } from './todos.effects';
 import { Observable } from 'rxjs/Observable';
-import { GET_TODOS_SUCCESS, getTodos } from '../reducers/todos.reducer';
 import { StoreModule } from '@ngrx/store';
 import { visibilityFilter } from '../reducers/visibiltyFilter.reducer';
+import { TodoActions } from '../actions/todo.actions';
 
 describe('TodoEffects', () => {
-  let runner, todosEffects, todosService;
+  let runner, todosEffects, todoActions, todosService;
 
   beforeEach(() => TestBed.configureTestingModule({
     imports: [
@@ -17,6 +17,7 @@ describe('TodoEffects', () => {
     ],
     providers: [
       TodosEffects,
+      TodoActions,
       {
         provide: TodosService,
         useValue: jasmine.createSpyObj('todosService', ['getTodos', 'addTodo'])
@@ -28,6 +29,7 @@ describe('TodoEffects', () => {
     runner = TestBed.get(EffectsRunner);
     todosEffects = TestBed.get(TodosEffects);
     todosService = TestBed.get(TodosService);
+    todoActions = TestBed.get(TodoActions);
   });
 
   it('getTodos$', () => {
@@ -38,9 +40,9 @@ describe('TodoEffects', () => {
 
     todosService.getTodos.and.returnValue(Observable.of(todos));
 
-    const expectedResult = ({type: GET_TODOS_SUCCESS, payload: todos});
+    const expectedResult = todoActions.getTodosSucces(todos);
 
-    runner.queue(getTodos());
+    runner.queue(todoActions.getTodos());
 
     todosEffects.getTodos$.subscribe(result => {
       expect(result).toEqual(expectedResult);
@@ -54,12 +56,12 @@ describe('TodoEffects', () => {
       completed: false
     };
 
-    todosService.getTodos.and.returnValue(Observable.of(newTodo));
-    const expectedResult = ({type: GET_TODOS_SUCCESS, payload: newTodo});
+    todosService.addTodo.and.returnValue(Observable.of(newTodo));
+    const expectedResult = todoActions.addTodoSuccess(newTodo);
 
-    runner.queue(getTodos());
+    runner.queue(todoActions.addTodo('new todo'));
 
-    todosEffects.getTodos$.subscribe(result => {
+    todosEffects.addTodo$.subscribe(result => {
       expect(result).toEqual(expectedResult);
     });
   });

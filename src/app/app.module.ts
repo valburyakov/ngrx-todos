@@ -18,6 +18,8 @@ import { HomepageComponent } from './components/home/homepage.component';
 import { FilterComponent } from './components/filter/filter.component';
 import { AppRoutingModule } from './app-routing.module';
 import { visibilityFilter } from './reducers/visibiltyFilter.reducer';
+import { TodoActions } from './actions/todo.actions';
+import { FilterActions } from './actions/filter.actions';
 
 @NgModule({
   declarations: [
@@ -41,7 +43,7 @@ import { visibilityFilter } from './reducers/visibiltyFilter.reducer';
     }),
     EffectsModule.run(TodosEffects),
   ],
-  providers: [TodosService],
+  providers: [TodoActions, FilterActions, TodosService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

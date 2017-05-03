@@ -1,33 +1,32 @@
 import { Injectable } from '@angular/core';
-import { Actions, Effect } from '@ngrx/effects';
-import { Observable } from 'rxjs';
-import { TodosService } from '../services/todos.service';
-import {
-  ADD_TODO, ADD_TODO_ERROR, ADD_TODO_SUCCESS, fetchTodos, GET_TODOS, GET_TODOS_ERROR,
-  GET_TODOS_SUCCESS
-} from '../reducers/todos.reducer';
 import { Store } from '@ngrx/store';
+import { Actions, Effect } from '@ngrx/effects';
+import { Observable } from 'rxjs/Rx';
+
+import { TodosService } from '../services/todos.service';
+import { TodoActions } from '../actions/todo.actions';
 
 @Injectable()
 export class TodosEffects {
   constructor( private actions$: Actions,
+               private todoActions: TodoActions,
                private todosService: TodosService,
                private store: Store<any> ) {
   }
 
   @Effect() getTodos$ = this.actions$
-    .ofType(GET_TODOS)
+    .ofType(TodoActions.GET_TODOS)
     .withLatestFrom(this.store.select("visibilityFilter"), ( action, filter ) => filter)
     .switchMap(filter =>
       this.todosService.getTodos(filter)
-        .map(todos => ({type: GET_TODOS_SUCCESS, payload: todos}))
-        .catch(() => Observable.of({type: GET_TODOS_ERROR})));
+        .map(todos => this.todoActions.getTodosSucces(todos))
+        .catch(() => Observable.of({type: TodoActions.GET_TODOS_ERROR})));
 
   @Effect() addTodo$ = this.actions$
-    .ofType(ADD_TODO)
+    .ofType(TodoActions.ADD_TODO)
     .switchMap(action =>
       this.todosService.addTodo(action.payload.title)
-        .map(todo => ({type: ADD_TODO_SUCCESS, payload: todo}))
-        .catch(() => Observable.of({type: ADD_TODO_ERROR})));
+        .map(todo => this.todoActions.addTodoSuccess(todo) )
+        .catch(() => Observable.of({type: TodoActions.ADD_TODO_ERROR})));
 
 }

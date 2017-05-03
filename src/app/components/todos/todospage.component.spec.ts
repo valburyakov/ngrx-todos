@@ -12,6 +12,8 @@ import { TodoComponent } from './todo.component';
 import { EffectsModule } from '@ngrx/effects';
 import { visibilityFilter } from '../../reducers/visibiltyFilter.reducer';
 import { todos } from '../../reducers/todos.reducer';
+import { TodoActions } from '../../actions/todo.actions';
+import { FilterActions } from '../../actions/filter.actions';
 
 describe('TodospageComponent', () => {
   let component: TodospageComponent;
@@ -26,7 +28,7 @@ describe('TodospageComponent', () => {
         StoreModule.provideStore({todos, visibilityFilter})],
       declarations: [ TodospageComponent, AddTodoComponent, TodosComponent, TodoComponent, FilterComponent ],
       providers: [
-        TodosEffects, TodosService
+        TodosEffects, TodosService, TodoActions, FilterActions
       ]
     })
     .compileComponents();

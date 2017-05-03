@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
-import { ADD_TODO_SUCCESS, addTodo, getTodos, removeTodo, toggleTodo } from '../../reducers/todos.reducer';
 import { TodosEffects } from '../../effects/todos.effects';
-import { setVisibilityFilter } from '../../reducers/visibiltyFilter.reducer';
 import { TodosService } from '../../services/todos.service';
+import { TodoActions } from '../../actions/todo.actions';
+import { FilterActions } from '../../actions/filter.actions';
 
 @Component({
   selector: 'app-todospage',
@@ -30,10 +30,14 @@ export class TodospageComponent {
     title: "Active"
   }];
 
-  constructor(private store: Store<any>, private todosEffects: TodosEffects, private todoService: TodosService) {
-    this.store.dispatch(getTodos());
+  constructor(private store: Store<any>,
+              private todoActions: TodoActions,
+              private filterActions: FilterActions,
+              private todosEffects: TodosEffects,
+              private todoService: TodosService) {
+    this.store.dispatch(todoActions.getTodos());
     this.todos$ = store.select("todos");
-    this.addTodoSuccess$ = this.todosEffects.addTodo$.filter(( { type }) => type === ADD_TODO_SUCCESS);
+    this.addTodoSuccess$ = this.todosEffects.addTodo$.filter(( { type }) => type === TodoActions.ADD_TODO_SUCCESS);
     this.activeFilter$ = store.select("visibilityFilter");
     this.todosModel$ = Observable.combineLatest(this.todos$, this.activeFilter$,
       (todos, filter) => {
@@ -46,19 +50,19 @@ export class TodospageComponent {
   }
 
   addTodo( todo ) {
-    this.store.dispatch(addTodo(todo));
+    this.store.dispatch(this.todoActions.addTodo(todo));
   }
 
   toggleTodo( id ) {
-    this.store.dispatch(toggleTodo(id));
+    this.store.dispatch(this.todoActions.toggleTodo(id));
   }
 
   removeTodo( id ) {
-    this.store.dispatch(removeTodo(id))
+    this.store.dispatch(this.todoActions.removeTodo(id))
   }
 
   changeFilter( filter ) {
-    this.store.dispatch(setVisibilityFilter(filter));
+    this.store.dispatch(this.filterActions.setVisibilityFilter(filter));
   }
 
 }

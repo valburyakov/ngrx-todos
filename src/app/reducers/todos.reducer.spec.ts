@@ -1,10 +1,9 @@
-import {
-  todos, ADD_TODO_SUCCESS, GET_TODOS, GET_TODOS_SUCCESS, REMOVE_TODO,
-  TOGGLE_TODO
-} from './todos.reducer';
+import { todos } from './todos.reducer';
+import { TodoActions } from '../actions/todo.actions';
 
 describe('Todos store', () => {
   let actual;
+  let todoActions = new TodoActions();
 
   const state = {
     data: [
@@ -22,7 +21,7 @@ describe('Todos store', () => {
   });
 
   it('should set pending to true when GET_TODOS is dispatched', () => {
-    actual = todos(state, {type: GET_TODOS, payload: {}});
+    actual = todos(state, todoActions.getTodos() );
 
     expect(actual.pending).toBeTruthy();
     expect(actual.error).toBeNull();
@@ -36,7 +35,7 @@ describe('Todos store', () => {
       error: null
     };
 
-    actual = todos(initialState, {type: GET_TODOS_SUCCESS, payload: state.data.slice()});
+    actual = todos(initialState, todoActions.getTodosSucces(state.data.slice()));
 
     expect(actual.pending).toBeFalsy();
     expect(actual.data).toEqual(state.data);
@@ -55,14 +54,14 @@ describe('Todos store', () => {
       error: null
     };
 
-    actual = todos(state, {type: ADD_TODO_SUCCESS, payload: newTodo });
+    actual = todos(state, todoActions.addTodoSuccess(newTodo));
 
     expect(actual).toEqual(expected);
   });
 
   it('should mark todo as completed when TOGGLE_TODO is dispatched', () => {
     const item_id = 1;
-    actual = todos(state, {type: TOGGLE_TODO, payload: {id: item_id} });
+    actual = todos(state, todoActions.toggleTodo(item_id));
     const [selectedItem] = actual.data.filter(todo => todo.id === item_id);
 
     expect(selectedItem.completed).toBeTruthy();
@@ -70,7 +69,7 @@ describe('Todos store', () => {
 
   it('should remove todo when REMOVE_TODO is dispatched', () => {
     const item_id = 1;
-    actual = todos(state, {type: REMOVE_TODO, payload: {id: item_id} });
+    actual = todos(state, todoActions.removeTodo(item_id));
 
     expect(actual.data.findIndex(todo => todo.id === item_id)).toEqual(-1)
   });
