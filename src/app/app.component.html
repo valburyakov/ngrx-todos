@@ -1,3 +1,6 @@
-<h1>
-  {{title}}
-</h1>
+<nav>
+  <a routerLink="/" routerLinkActive="active">{{'home' | uppercase}}</a>
+  <a routerLink="/todos" routerLinkActive="active">{{'Todos' | uppercase}}</a>
+</nav>
+
+<router-outlet></router-outlet>
