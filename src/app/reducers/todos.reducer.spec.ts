@@ -1,9 +1,9 @@
-import { todos } from './todos.reducer';
+import todosReducer from './todos.reducer';
 import { TodoActions } from '../actions/todo.actions';
 
 describe('Todos store', () => {
   let actual;
-  let todoActions = new TodoActions();
+  const todoActions = new TodoActions();
 
   const state = {
     data: [
@@ -15,13 +15,13 @@ describe('Todos store', () => {
   };
 
   it('should return current state when no valid actions have been made', () => {
-    actual = todos(state, {type: 'INVALID_ACTION', payload: {}});
+    actual = todosReducer(state, {type: 'INVALID_ACTION', payload: {}});
 
     expect(actual).toEqual(state);
   });
 
   it('should set pending to true when GET_TODOS is dispatched', () => {
-    actual = todos(state, todoActions.getTodos() );
+    actual = todosReducer(state, todoActions.getTodos() );
 
     expect(actual.pending).toBeTruthy();
     expect(actual.error).toBeNull();
@@ -35,7 +35,7 @@ describe('Todos store', () => {
       error: null
     };
 
-    actual = todos(initialState, todoActions.getTodosSucces(state.data.slice()));
+    actual = todosReducer(initialState, todoActions.getTodosSucces(state.data.slice()));
 
     expect(actual.pending).toBeFalsy();
     expect(actual.data).toEqual(state.data);
@@ -54,24 +54,24 @@ describe('Todos store', () => {
       error: null
     };
 
-    actual = todos(state, todoActions.addTodoSuccess(newTodo));
+    actual = todosReducer(state, todoActions.addTodoSuccess(newTodo));
 
     expect(actual).toEqual(expected);
   });
 
-  it('should mark todo as completed when TOGGLE_TODO is dispatched', () => {
-    const item_id = 1;
-    actual = todos(state, todoActions.toggleTodo(item_id));
-    const [selectedItem] = actual.data.filter(todo => todo.id === item_id);
+  it('should mark todo as completed when TOGGLE_COMPLETE is dispatched', () => {
+    const item = state.data[1];
+    actual = todosReducer(state, todoActions.toggleTodo(item));
+    const [selectedItem] = actual.data.filter(todo => todo.id === item.id);
 
     expect(selectedItem.completed).toBeTruthy();
   });
 
   it('should remove todo when REMOVE_TODO is dispatched', () => {
-    const item_id = 1;
-    actual = todos(state, todoActions.removeTodo(item_id));
+    const item = state.data[1];
+    actual = todosReducer(state, todoActions.removeTodo(item));
 
-    expect(actual.data.findIndex(todo => todo.id === item_id)).toEqual(-1)
+    expect(actual.data.findIndex(todo => todo.id === item.id)).toEqual(-1);
   });
 
 });
