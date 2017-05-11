@@ -1,45 +1,97 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EffectsModule } from '@ngrx/effects';
-import { StoreModule } from '@ngrx/store';
+import { Store, StoreModule } from '@ngrx/store';
 
-import reducer from '../reducers';
+import { AppState } from '../reducers';
 import { TodospageComponent } from './todos-page.component';
-import { AddTodoComponent } from '../components/todos/add-todo.component';
-import { TodosComponent } from '../components/todos/todos.component';
-import { TodoComponent } from '../components/todos/todo.component';
-import { FilterComponent } from '../components/filter/filter.component';
 import { TodosEffects } from '../effects/todos.effects';
-import { TodosService } from '../services/todos.service';
 import { TodoActions } from '../actions/todo.actions';
 import { FilterActions } from '../actions/filter.actions';
+import { MockStore } from '../testing/mock-store';
+import { TodoFilter } from '../models/filter.model';
+import { TodoModule } from '../components/todo.module';
 
-describe('TodospageComponent', () => {
+describe('Container: TodospageComponent', () => {
   let component: TodospageComponent;
   let fixture: ComponentFixture<TodospageComponent>;
+  let mockStore: MockStore<AppState>;
+  let todoActions: TodoActions;
+  let dispatchSpy: jasmine.Spy;
+
+  const initialState = {
+    todos: {
+      pending: false,
+      error: null,
+      data: [
+        { id: 1, title: 'Some todo', completed: false }
+      ]
+    },
+    filter: 'SHOW_ALL' as TodoFilter
+  };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        FormsModule,
-        ReactiveFormsModule,
+        TodoModule,
         EffectsModule,
-        StoreModule.provideStore(reducer)],
-      declarations: [ TodospageComponent, AddTodoComponent, TodosComponent, TodoComponent, FilterComponent ],
+        StoreModule.provideStore({}),
+      ],
       providers: [
-        TodosEffects, TodosService, TodoActions, FilterActions
+        TodosEffects,
+        { provide: Store, useValue: new MockStore<AppState>(initialState)}
       ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
+    mockStore = TestBed.get(Store);
+    todoActions = TestBed.get(TodoActions);
+    dispatchSpy = spyOn(mockStore, 'dispatch').and.callThrough();
+
     fixture = TestBed.createComponent(TodospageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create instance with subscriptions', () => {
     expect(component).toBeTruthy();
+
+    component.todos$.subscribe(todos => {
+      expect(todos).toEqual(initialState.todos)
+    });
+
+    component.activeFilter$.subscribe(filter => {
+      expect(filter).toEqual(initialState.filter)
+    })
   });
+
+  it('should add new todo', () => {
+    component.addTodo('new todo');
+
+    expect(dispatchSpy).toHaveBeenCalledWith(todoActions.addTodo('new todo'));
+  });
+
+  it('should toggle todo item', () => {
+    const todoItem = initialState.todos.data[0];
+    component.toggleTodo(todoItem);
+
+    expect(dispatchSpy).toHaveBeenCalledWith(todoActions.toggleTodo(todoItem));
+  });
+
+  it('should remove todo', () => {
+    const todoItem = initialState.todos.data[0];
+    component.removeTodo(todoItem);
+
+    expect(dispatchSpy).toHaveBeenCalledWith(todoActions.removeTodo(todoItem));
+  });
+
+  it('should change filter', () => {
+    const filterActions = TestBed.get(FilterActions);
+    const newFilter: TodoFilter = 'SHOW_COMPLETED';
+    component.changeFilter(newFilter);
+
+    expect(dispatchSpy).toHaveBeenCalledWith(filterActions.setVisibilityFilter(newFilter));
+  });
+
 });
