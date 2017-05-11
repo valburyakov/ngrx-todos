@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { TodoFilter } from '../../models/filter.model';
+import { FilterRecord, TodoFilter } from '../../models/filter.model';
 
 @Component({
   selector: 'app-filters',
@@ -11,8 +11,8 @@ import { TodoFilter } from '../../models/filter.model';
   `
 })
 export class FilterComponent {
-  @Input() filters;
-  @Output() changeFilter = new EventEmitter<{}>();
+  @Input() filters: FilterRecord[];
+  @Output() changeFilter = new EventEmitter<TodoFilter>();
   filter: FormControl;
 
   constructor() {
@@ -22,5 +22,6 @@ export class FilterComponent {
   @Input() set active( val: TodoFilter ) {
     this.filter.setValue(val);
   }
+
 
 }
