@@ -4,16 +4,19 @@ import { TestBed } from '@angular/core/testing';
 import { TodosEffects } from './todos.effects';
 import { Observable } from 'rxjs/Observable';
 import { StoreModule } from '@ngrx/store';
-import { visibilityFilter } from '../reducers/visibiltyFilter.reducer';
+import { default as reducer } from '../reducers/visibiltyFilter.reducer';
 import { TodoActions } from '../actions/todo.actions';
 
 describe('TodoEffects', () => {
-  let runner, todosEffects, todoActions, todosService;
+  let runner;
+  let todosEffects;
+  let todoActions;
+  let todosService;
 
   beforeEach(() => TestBed.configureTestingModule({
     imports: [
       EffectsTestingModule,
-      StoreModule.provideStore({ visibilityFilter }),
+      StoreModule.provideStore({reducer})
     ],
     providers: [
       TodosEffects,
@@ -65,6 +68,5 @@ describe('TodoEffects', () => {
       expect(result).toEqual(expectedResult);
     });
   });
-
 
 });

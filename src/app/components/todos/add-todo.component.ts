@@ -12,7 +12,7 @@ import { FormControl } from '@angular/forms';
 })
 export class AddTodoComponent implements OnInit {
 
-  control : FormControl = new FormControl("");
+  control : FormControl = new FormControl('');
   @Output() add = new EventEmitter();
 
   constructor() { }
